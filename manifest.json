@@ -1,0 +1,35 @@
+{
+    "name": "NetQuest: Misi Jaringan Komputer",
+    "short_name": "NetQuest",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#34188A",
+    "theme_color": "#7B3FD6",
+    "description": "Learning game jaringan komputer untuk siswa SMA Kelas X Informatika.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
