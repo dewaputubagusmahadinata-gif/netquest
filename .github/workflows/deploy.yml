@@ -1,0 +1,81 @@
+name: Deploy Web to GitHub Pages & Build APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build Flutter Web (GitHub Pages)
+        run: |
+          flutter build web --release --base-href "/netquest/" --no-wasm-dry-run
+          mkdir -p build/web/assets/assets/audio build/web/assets/audio build/web/audio
+          cp -r assets/audio/* build/web/assets/assets/audio/ || true
+          cp -r assets/audio/* build/web/assets/audio/ || true
+          cp -r assets/audio/* build/web/audio/ || true
+
+      - name: Deploy Web to GitHub Pages (gh-pages branch)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+          publish_branch: gh-pages
+
+      - name: Build Android APK
+        run: flutter build apk --release
+
+      - name: Upload APK to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: NetQuest-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          tag_name: v1.0.0
+          name: NetQuest v1.0.0
+          body: |
+            ### 🌐 NetQuest: Misi Jaringan Komputer
+            Learning Game untuk Siswa SMA Kelas X Informatika (Kurikulum Merdeka).
+
+            - **Mainkan di Web**: [https://dewaputubagusmahadinata-gif.github.io/netquest/](https://dewaputubagusmahadinata-gif.github.io/netquest/)
+            - **Download Android APK**: Download file `NetQuest.apk` di aset rilis di bawah untuk instalasi langsung di ponsel Android.
+          files: |
+            build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
